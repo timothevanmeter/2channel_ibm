@@ -1,0 +1,64 @@
+#########################################
+# YAML CONFIGURATION FILE FOR IBM MODEL
+#########################################
+
+#########################################
+ibm_functioning:
+  description: >
+    "This part specifies the parameter values for the general functioning of the IBM model."
+  collision_authorized: false
+
+
+#########################################
+ibm_display:
+  description: >
+    "This part specifies the parameter values for the display of the IBM model."
+  enable_display: true
+  delay_between_frames: 250 # given in milliseconds
+
+
+#########################################
+ibm_output:
+  description: >
+    "This part specifies how the output of the model's simulation are saved."
+  enable_output: true
+
+
+#########################################
+resource: 
+  description: >
+    "This part specifies the parameter values for the 2 resource species."
+  grid_size:
+  initial_cell_biomass:
+  sp1_growth_rate:
+  sp2_growth_rate:  
+
+  
+#########################################  
+herbivore_sp1: 
+  description: >
+    "This part specifies the parameter values for the herbivore species 1."
+  body_radius:
+  dispersal_distance:
+  vision_radius:
+  initial_biomass:
+  maximum_biomass:
+  metabolic_cost_rate:
+  background_death_rate:
+  conversion_efficiency:
+  reproduction_threshold:
+
+
+herbivore_sp2: 
+  description: >
+    "This part specifies the parameter values for the herbivore species 2."
+  body_radius:
+  dispersal_distance:
+  vision_radius:
+  initial_biomass:
+  maximum_biomass:
+  metabolic_cost_rate:
+  background_death_rate:
+  conversion_efficiency:
+  reproduction_threshold:
+

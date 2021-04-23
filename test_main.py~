@@ -1,0 +1,60 @@
+###############################################
+# Author of this project: Timothe van Meter
+
+# Last modification: March 29th 2021
+
+# Contact: tvanme2@uic.edu
+
+# License: GNU General Public License version 3
+# https://opensource.org/licenses/GPL-3.0
+###############################################
+import matplotlib
+import random as rd
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+from matplotlib.colors import BoundaryNorm
+from matplotlib.ticker import MaxNLocator
+import pygame
+import pandas as pd
+import subprocess
+# -----------------------------
+import test_resource as res
+import test_animal as ani
+import test_output as out
+import test_display as disp
+# -----------------------------
+cell_size = 10
+# Expressed in number of cells:
+grid_size = 40
+
+# To account for the border cells
+plot_size = (cell_size+2)*grid_size
+
+##################################################
+##################################################
+
+screen = disp.create_display(plot_size, cell_size)
+
+
+init_herbivores = 10
+init_predators = 10
+
+def init_pos():
+    round(rd.uniform(cell_size+10.0, plot_size-cell_size-10.0), 0)
+
+
+ani.init_animals()
+
+running = True
+print("-----------------------------")
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            # Erase previous drawings
+    ani.update_all_agents(screen)
+    # screen.fill(background)
+    pygame.time.wait(10)
+    # print("-----------------------------")
+    pygame.display.flip()
