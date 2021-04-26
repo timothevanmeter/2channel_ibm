@@ -121,11 +121,11 @@ class agent():
     def metabolic_cost(self):
         # IF THE METABOLIC COST FOR THIS TIME STEP
         # EXCEEDS THE CURRENT BIOMASS
-        if self.biomass - self.max_biomass * 0.05 <= 0.0:
+        if self.biomass - self.max_biomass * 0.01 <= 0.0:
             # THE AGENT DIES
             self.death(True)
         else:
-            self.biomass = self.biomass - self.max_biomass * 0.05
+            self.biomass = self.biomass - self.max_biomass * 0.01
 
 # -----------------------------------------------------------------                    
     def death(self, forced):
@@ -286,6 +286,12 @@ class herbivore(agent):
         self.max_biomass = 200.0
         self.colour = (0, 0, 255)
         self.thickness = 3
+        # The predator's preference for the herbivore's species
+        self.alpha = 0.75
+        # if self.species[0] == 1:
+        #     self.alpha = 0.75
+        # if self.species[0] == 2:
+        #     self.alpha = 1.0-0.75
         # Individual memory allocation to store
         # the targeted cell in the previous time step
         self.target = False
@@ -334,6 +340,7 @@ class herbivore(agent):
                     # biomass will do!
                     # No need to use a looot more memory
                     self.consume(grid.cells[i])
+                    self.target = False
                     return 1
                     # return grid.cells[i]
                 # LOOKING FOR THE BIOMASS BIOMASS QUANTITY
@@ -440,26 +447,34 @@ class herbivore(agent):
 
     def update(self, grid):
 
-        # self.metabolic_cost()
-        # self.death(False)
+        # Calling the search() function multiple times can cause to obtain different
+        # value returned (in the case of predators), calling it only once and
+        # storing the returned value avoid this type of error.
+        search_result = self.search(grid)
+
+        self.metabolic_cost()
+        self.death(False)
         # If there is predator(s) in visible surroundings
         # Then flee in opposite direction
         if self.fleeing() == True:
             return 0
-        if self.biomass >= 150.0:
+        elif self.biomass >= 150.0:
             self.reproduce()
             return 0
         # Then look for resource to consume nearby
         # (within their vision radius)
-        elif self.search(grid) == 0:
+        elif search_result == 0:
+        # elif self.search(grid) == 0:
             # If there is no resource move at random
             # to a new position
             self.random_movement()
             return 0
-        elif self.search(grid) != 1 and self.search(grid) != 0 :
+        elif search_result != 1 and search_result != 0 :
+        # elif self.search(grid) != 1 and self.search(grid) != 0 :
             # If there is available resources nearby
             # move towards the resource
-            self.move_to(self.search(grid))
+            self.move_to(search_result)
+            # self.move_to(self.search(grid))
             return 0
 
 
@@ -484,8 +499,6 @@ class predator(agent):
         self.d = 10.0
         # Vision radius
         self.v = 40.0
-        # The predator's preference for herbivore of species 1
-        self.alpha = 0.75
         # self.species = rd.randint(1,2)
         self.species = ('PREDATOR', 1)
         self.biomass = 90.0 #rd.random()
@@ -520,12 +533,17 @@ class predator(agent):
         
         # If the targeted herbivore in the previous time step
         # is within consumption range then consume it
-        if self.target != False and\
-           self.distance_pos(self.target.pos())-(self.r+self.target.r)\
-                <= 0.0:
-            self.consume(self.target)
-            self.target = False
-            return 1
+        
+        # if self.target != False and\
+        #    self.distance_pos(self.target.pos())-(self.r+self.target.r)\
+        #         <= 0.0:
+        #     self.consume(self.target)
+        #     self.target = False
+        #     return 1
+        # elif self.target != False and\
+        #    self.distance_pos(self.target.pos())-(self.r+self.target.r)\
+        #         <= self.v:
+        #     return target            
         
         # Searching for the closest herbivore, within its vision radius
         # Verify if consumption is possible:
@@ -533,32 +551,29 @@ class predator(agent):
         for i in range(len(herbivores)):
             if self.distance_pos(herbivores[i].pos())\
                    -(self.r+herbivores[i].r) <= self.v:
-                
-                if self.distance_pos(herbivores[i].pos())\
-                   -(self.r+herbivores[i].r) <= 0.0:
-                    # Any herbivores[i]ivore at distance 0.0 will do!
-                    # No need to use a looot more memory
-                    self.consume(herbivores[i])
-                    return 1
-                # LOOKING FOR THE BIOMASS BIOMASS QUANTITY
-                # AVAILABLE WITHIN VISION RADIUS OF THAT
-                # INDIVIDUAL
-                consumables.append( (herbivores[i], self.distance_pos(herbivores[i].pos())) )
+                consumables.append( (herbivores[i], max(self.distance_pos(herbivores[i].pos())-(self.r+herbivores[i].r), 0.0)) )
         if not consumables:
             return 0
         else:
-            mininmum = consumables[0][1]
-            target = consumables[0][0]
             for i in range(len(consumables)):
-                if consumables[i][1] < mininmum:
-                    mininmum = consumables[i][1]
-                    # Ensures that there is only one target
-                    # even if there are multiple minima
-                    # Send only the cell herbivoreand not the
-                    # associated distance
-                    target = consumables[i][0]
-
-        return target
+                # TESTING FOR THE FORMULA:
+                # U(0,1) < ALPHA * 2**-(d/max/6)
+                if rd.uniform(0,1) <= consumables[i][0].alpha*\
+                   2**(consumables[i][1]/self.v/6):
+                    if consumables[i][1] <= 0.0:
+                        # Any herbivore at distance 0.0 will do!
+                        # No need to use a looot more memory
+                        self.consume(consumables[i][0])
+                        # self.target = False
+                        # print('CONSUMPTION')
+                        return 1
+                    else:
+                        # target = consumables[i][0]
+                        return consumables[i][0]
+                # IF NOTHING WAS SUCCESSFUL
+                # print('FAIL')
+                return 0
+                    
 
 # -----------------------------------------------------------------
 
@@ -582,27 +597,32 @@ class predator(agent):
 
     def update(self, grid):
 
-        # self.metabolic_cost()
-        # self.death(False)
+        self.metabolic_cost()
+        self.death(False)
+
+        # Calling the search() function multiple times can cause to obtain different
+        # value returned (in the case of predators), calling it only once and
+        # storing the returned value avoid this type of error.
+        search_result = self.search(grid)
 
         if self.biomass >= 150.0:
             self.reproduce()
-            # print("REPRODUCTION")
             return 0
 
-        # Then look for resource to consume nearby
+        # Look for resource to consume nearby
         # (within their vision radius)
-        elif self.search(grid) == 0:
+        elif search_result == 0:
             # If there is no resource move at random
             # to a new position
             self.random_movement()
-            # print("RANDOM MOVEMENT")
             return 0
-        elif self.search(grid) != 1 and self.search(grid) != 0 :
+        elif search_result == 1:
+            return 0
+        elif search_result != 1 and search_result != 0 :
             # If there is available resources nearby
             # move towards the resource
-            self.move_to(self.search(grid))
-            # print("DIRECTED MOVEMENT")
+            # self.move_to(self.search(grid))
+            self.move_to(search_result)
             return 0
 
 # -----------------------------------------------------------------            

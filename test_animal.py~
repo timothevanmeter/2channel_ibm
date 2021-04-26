@@ -378,8 +378,7 @@ class herbivore(agent):
         for i in range(len(predators)):
             # If there is predator(s) in visible surroundings
             # Then flee in opposite direction
-            if self.distance_pos(predators[i].pos()) <= self.v\
-            and self.species[1] == predators[i].species:
+            if self.distance_pos(predators[i].pos()) <= self.v:
                 # MOVE AWAY FROM THE FIRST THREAT
 
                 xpos = predators[i].pos()[0]
@@ -485,8 +484,10 @@ class predator(agent):
         self.d = 10.0
         # Vision radius
         self.v = 40.0
+        # The predator's preference for herbivore of species 1
+        self.alpha = 0.75
         # self.species = rd.randint(1,2)
-        self.species = ('PREDATOR', rd.randint(1,2))
+        self.species = ('PREDATOR', 1)
         self.biomass = 90.0 #rd.random()
         self.max_biomass = 200.0
         self.colour = (255, 0, 0)
@@ -531,8 +532,7 @@ class predator(agent):
         # - the herbivore is part of the consumer diet
         for i in range(len(herbivores)):
             if self.distance_pos(herbivores[i].pos())\
-                   -(self.r+herbivores[i].r) <= self.v \
-                and self.species[1] == herbivores[i].species[1]:
+                   -(self.r+herbivores[i].r) <= self.v:
                 
                 if self.distance_pos(herbivores[i].pos())\
                    -(self.r+herbivores[i].r) <= 0.0:
@@ -613,8 +613,6 @@ def update_all_agents(graphic, screen, grid):
     total_herbivores1 = 0
     total_herbivores2 = 0
     total_predators = 0
-    total_predators1 = 0
-    total_predators2 = 0
     for ag in agents:
         if graphic ==True:
                 ag.display(screen)
@@ -626,14 +624,10 @@ def update_all_agents(graphic, screen, grid):
                 total_herbivores2 += 1            
             total_herbivores += 1
         if ag.species[0] == 'PREDATOR':
-            ag.update(grid)
-            if ag.species[1] == 1:
-                total_predators1 += 1
-            else:
-                total_predators2 += 1            
+            ag.update(grid)           
             total_predators += 1
 
-    count = [ total_herbivores, total_herbivores1, total_herbivores2, total_predators, total_predators1, total_predators2 ]
+    count = [ total_herbivores, total_herbivores1, total_herbivores2, total_predators ]
     return count
 
 # -----------------------------------------------------------------

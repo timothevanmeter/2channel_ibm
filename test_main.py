@@ -36,7 +36,7 @@ background_colour = (255,255,255)
 ##################################################
 
 init_herbivores = 50
-init_predators = 20
+init_predators = 10
 
 max_time = 500
 
