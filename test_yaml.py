@@ -3,14 +3,37 @@
 ##########################
 
 import yaml
+import pandas as pd
+
+# sim = pd.read_csv("/home/timothe/virtualenvs/test-ibm/sim_summary.csv")
+
+# -------------------------------------------
 
 
-def read_yaml(category, parameter_name):
-    with open('ibm_config.yml') as f:
+def read(category, parameter_name, sim_num):
+
+    sim = pd.read_csv("/home/timothe/virtualenvs/test-ibm/sim_summary.csv")
+    
+    with open('/home/timothe/virtualenvs/test-ibm/ibm_config.yml') as f:
+        
         config = yaml.load(f, Loader=yaml.FullLoader)
+        # If the parameter has variable values for the simulation
+        # looks for the appropriate value in the sim_summary.csv
+        # table
+        if config[category][parameter_name] == "variable":
+            return sim[parameter_name][sim_num]
 
+        # Otherwise use the value listed in the yaml
+        # configuration file
         return config[category][parameter_name]
 
-cat = 'ibm_display'
-name = 'delay_between_frames'
-print("value =", read_yaml(cat,name))
+    
+# print(read('predator', 'initial_number_individuals', 0))
+
+# -------------------------------------------
+
+
+def read_plain(category, parameter_name):
+    with open('/home/timothe/virtualenvs/test-ibm/ibm_config.yml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+        return config[category][parameter_name]

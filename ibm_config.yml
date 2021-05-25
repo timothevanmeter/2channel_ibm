@@ -6,14 +6,17 @@
 ibm_functioning:
   description: >
     "This part specifies the parameter values for the general functioning of the IBM model."
-  collision_authorized: false
+  collision_authorized: False
+  max_simulation_time: 50
+  enable_stop_criteria: True
+  number_of_replicates: 10
 
 
 #########################################
 ibm_display:
   description: >
     "This part specifies the parameter values for the display of the IBM model."
-  enable_display: true
+  enable_display: False
   delay_between_frames: 250 # given in milliseconds
 
 
@@ -21,7 +24,7 @@ ibm_display:
 ibm_output:
   description: >
     "This part specifies how the output of the model's simulation are saved."
-  enable_output: true
+  enable_output: True
 
 
 #########################################
@@ -35,7 +38,8 @@ resource:
 
   
 #########################################  
-herbivore_sp1: 
+#herbivore_sp1:
+herbivore: 
   description: >
     "This part specifies the parameter values for the herbivore species 1."
   body_radius:
@@ -47,11 +51,28 @@ herbivore_sp1:
   background_death_rate:
   conversion_efficiency:
   reproduction_threshold:
+  initial_number_individuals: 60
 
 
-herbivore_sp2: 
+#herbivore_sp2: 
+#  description: >
+#    "This part specifies the parameter values for the herbivore species 2."
+#  body_radius:
+#  dispersal_distance:
+#  vision_radius:
+#  initial_biomass:
+#  maximum_biomass:
+#  metabolic_cost_rate:
+#  background_death_rate:
+#  conversion_efficiency:
+#  reproduction_threshold:
+#  initial_number_individuals:
+  
+  
+#########################################  
+predator: 
   description: >
-    "This part specifies the parameter values for the herbivore species 2."
+    "This part specifies the parameter values for the predator"
   body_radius:
   dispersal_distance:
   vision_radius:
@@ -61,4 +82,18 @@ herbivore_sp2:
   background_death_rate:
   conversion_efficiency:
   reproduction_threshold:
+  initial_number_individuals: variable
+
+
+
+
+
+
+
+
+
+
+
+
+
 

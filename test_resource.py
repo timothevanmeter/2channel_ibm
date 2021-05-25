@@ -8,12 +8,11 @@
 # License: GNU General Public License version 3
 # https://opensource.org/licenses/GPL-3.0
 ###############################################
-import matplotlib
+# import matplotlib
 import random as rd
 import numpy as np
 # import matplotlib.pyplot as plt
 import math
-
 import test_display as disp
 
 # New Model test
@@ -328,10 +327,14 @@ class lattice():
 
     def update_all_cells(self, graphic, screen):
 
-        total_biomass = 0.0
+        biomass_1 = 0.0
+        biomass_2 = 0.0
         # Update and display all cells 
         for cell in self.cells:
-            total_biomass += cell.biomass_value()
+            if cell.species == 1:
+                biomass_1 += cell.biomass_value()
+            elif cell.species == 2:
+                biomass_2 += cell.biomass_value()
             if graphic ==True:
                 cell.display(screen)
         for border in self.borders:
@@ -339,5 +342,5 @@ class lattice():
                 border.display(screen)
         self.update()
         
-        return total_biomass
+        return (round(biomass_1/150, 0), round(biomass_2/150, 0))
 

@@ -8,13 +8,13 @@
 # License: GNU General Public License version 3
 # https://opensource.org/licenses/GPL-3.0
 ###############################################
-import matplotlib
+# import matplotlib
 import random as rd
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import math
-from matplotlib.colors import BoundaryNorm
-from matplotlib.ticker import MaxNLocator
+# from matplotlib.colors import BoundaryNorm
+# from matplotlib.ticker import MaxNLocator
 import pygame
 # -----------------------------
 import test_resource as res
@@ -379,27 +379,27 @@ class herbivore(agent):
 
 ####################################################
 
-herbivore(20, 20)
-herbivore(20, 20)
-herbivore(20, 20)
-herbivore(20, 20)
+# herbivore(20, 20)
+# herbivore(20, 20)
+# herbivore(20, 20)
+# herbivore(20, 20)
 
-herbivore(20, 400)
-herbivore(20, 400)
-herbivore(20, 400)
-herbivore(20, 400)
+# herbivore(20, 400)
+# herbivore(20, 400)
+# herbivore(20, 400)
+# herbivore(20, 400)
 
-herbivore(400, 20)
-herbivore(400, 20)
-herbivore(400, 20)
-herbivore(400, 20)
+# herbivore(400, 20)
+# herbivore(400, 20)
+# herbivore(400, 20)
+# herbivore(400, 20)
 
-herbivore(400, 400)
-herbivore(400, 400)
-herbivore(400, 400)
-herbivore(400, 400)
+# herbivore(400, 400)
+# herbivore(400, 400)
+# herbivore(400, 400)
+# herbivore(400, 400)
 
-grid = res.lattice(grid_size+2)
+# grid = res.lattice(grid_size+2)
 
 
 # grid.cells[29].species = 1
@@ -409,9 +409,9 @@ grid = res.lattice(grid_size+2)
 # grid.cells[780].update_biomass(100.0)
 # grid.cells[780].update_colour()
 
-grid.cells[1499].species = 1
-grid.cells[1499].update_biomass(100.0)
-grid.cells[1499].update_colour()
+# grid.cells[1499].species = 1
+# grid.cells[1499].update_biomass(100.0)
+# grid.cells[1499].update_colour()
 
 # grid.cells[1400].change_colour(red)
 # grid.cells[1400].update_biomass(100.0)
@@ -421,44 +421,44 @@ grid.cells[1499].update_colour()
 # print('target =',a.search(grid))
 # print('target pos =',a.search(grid).pos())
 
-for cell in grid.cells:
-        cell.update_colour()
+# for cell in grid.cells:
+#         cell.update_colour()
 
 ####################################################
 # pygame.display.flip()
 
-running = True
+# running = True
 
-print("-----------------------------")
+# print("-----------------------------")
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
 
-    # Erase previous drawings
-    screen.fill(background_colour)
-    for cell in grid.cells:
-        cell.display(screen)
-    for border in grid.borders:
-        border.display(screen)
-        # if cell.biomass > 0.0:
-        #     print("cell biomass =", cell.biomass_value())
-    grid.update()
-    # for agent in agents:
-    # print("# Active herbivores:", len(herbivores))
-    for herb in herbivores:
-        # herb.show()
-        herb.update(grid)
-        # agent.move_to(agent.search(grid))
-        # if agent.random_movement() == True:
-        #     pygame.time.wait(500)
-        # try:
-        #     agent.consume()
-        # except:
-        #     print('0')
-        herb.display()
-    pygame.time.wait(250)
-    # print("-----------------------------")
-    pygame.display.flip()
+#     # Erase previous drawings
+#     screen.fill(background_colour)
+#     for cell in grid.cells:
+#         cell.display(screen)
+#     for border in grid.borders:
+#         border.display(screen)
+#         # if cell.biomass > 0.0:
+#         #     print("cell biomass =", cell.biomass_value())
+#     grid.update()
+#     # for agent in agents:
+#     # print("# Active herbivores:", len(herbivores))
+#     for herb in herbivores:
+#         # herb.show()
+#         herb.update(grid)
+#         # agent.move_to(agent.search(grid))
+#         # if agent.random_movement() == True:
+#         #     pygame.time.wait(500)
+#         # try:
+#         #     agent.consume()
+#         # except:
+#         #     print('0')
+#         herb.display()
+#     pygame.time.wait(250)
+#     # print("-----------------------------")
+#     pygame.display.flip()
 

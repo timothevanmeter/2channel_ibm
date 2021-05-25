@@ -8,13 +8,13 @@
 # License: GNU General Public License version 3
 # https://opensource.org/licenses/GPL-3.0
 ###############################################
-import matplotlib
+# import matplotlib
 import random as rd
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import math
-from matplotlib.colors import BoundaryNorm
-from matplotlib.ticker import MaxNLocator
+# from matplotlib.colors import BoundaryNorm
+# from matplotlib.ticker import MaxNLocator
 import pygame
 import pandas as pd
 import subprocess
@@ -33,63 +33,50 @@ plot_size = (cell_size+2)*grid_size
 global agents
 global herbivores
 global predators
+global dead_agents
 
 agents = []
 herbivores = []
 predators = []
-
-##################################################
-
-# screen = disp.create_display(plot_size, cell_size)
-
-# background_colour = (255,255,255)
-# (width, height) = (plot_size, plot_size)
-
-# screen = pygame.display.set_mode((width+2*cell_size, height+2*cell_size))
-# pygame.display.set_caption('IBM Monitor Display')
-# screen.fill(background_colour)
-# clock = pygame.time.Clock()
-
-##################################################
-# def distance_agent_pos(agent_a, pos):
-
-#     d = round(math.sqrt( (agent_a.x - pos[0])**2 + (agent_a.y - pos[1])**2 ), 1)
-#     return d
-##################################################
-
+dead_agents = []
 
 ####################################################
 ####################################################
 ####################################################
-
-
 
 class agent():
 
 # -----------------------------------------------------------------                        
     def __init__(self, xpos, ypos):
 
+        pass
         # global agents
-        self.x = xpos
-        self.y = ypos
+        # self.x = xpos
+        # self.y = ypos
         # Body radius
-        self.r = 10.0
+        # self.r = 10.0
         # Dispersal distance
-        self.d = 40.0
+        # self.d = 40.0
         # self.species = rd.randint(1,2)
-        self.species = ('AGENT', 0)
-        self.biomass = 50.0 #rd.random()
-        self.max_biomass = 200.0
-        self.colour = (0, 0, 255)
-        self.thickness = 3
+        # self.species = ('AGENT', 0)
+        # self.biomass = 50.0 #rd.random()
+        # self.max_biomass = 200.0
+        # self.colour = (0, 0, 255)
+        # self.thickness = 3
+        # This status specifies if the agent is alive or not
+        # To avoid removing items of the list of agents
+        # while looping over it, we commit agents to die by
+        # adding them to a list and changing their status so
+        # other agents cannot interact with them
+        # self.status = True
         # self.biomass = np.random.rand(1,100)
         # self.k = 100.0
-        agents.append(self)
+        # agents.append(self)
 
 # -----------------------------------------------------------------                    
     def pos(self):
-    	pos = (self.x, self.y)
-    	return pos
+        pos = (self.x, self.y)
+        return pos
 
 # -----------------------------------------------------------------                    
     def biomass_value(self):
@@ -98,12 +85,6 @@ class agent():
 # -----------------------------------------------------------------                    
     def species(self, nb):
     	return self.species[nb]
-    
-# -----------------------------------------------------------------                        
-    # def display(self, screen):
-    #     global cell_size
-    #     pygame.draw.circle(screen, self.colour, (self.x+2*cell_size, self.y+2*cell_size), self.r, self.thickness)
-    #     return 0
 
 # -----------------------------------------------------------------                        
     def display(self, screen):
@@ -129,19 +110,21 @@ class agent():
 
 # -----------------------------------------------------------------                    
     def death(self, forced):
-        # global agents
+        # global dead_agents
         death_percentage = 5
         if rd.randrange(0, 100, 1) >= 100 - death_percentage\
            or forced == True:
             # THE AGENT DIES
-            agents.remove(self)
-            if self.__class__.__name__ == 'herbivore':
-                herbivores.remove(self)
-                # print('DEATH HERBIVORE')
-            elif self.__class__.__name__ == 'predator':
-                predators.remove(self)
-                # print('DEATH PREDATOR')
-            del self
+            dead_agents.append(self)
+            self.status = False
+            # agents.remove(self)
+            # if self.__class__.__name__ == 'herbivore':
+            #     herbivores.remove(self)
+            #     # print('DEATH HERBIVORE')
+            # elif self.__class__.__name__ == 'predator':
+            #     predators.remove(self)
+            #     # print('DEATH PREDATOR')
+            # del self
 
 # -----------------------------------------------------------------            
             
@@ -168,17 +151,17 @@ class agent():
                 if (xpos < self.r+cell_size) or (xpos > plot_size-cell_size-self.r):
                     if fleeing == True:
                         xpos = self.x
-                        ypos = round(self.y + rd.uniform(-self.d, self.d),1)
-                    xpos = round(self.x + rd.uniform(-self.d, self.d),1)
+                        ypos = round(self.y + rd.uniform(-self.d, self.d), 1)
+                    xpos = round(self.x + rd.uniform(-self.d, self.d), 1)
                     # OLDER RECURSIVE VERSION PART:
                     # return self.check_bounds(round(self.x + rd.uniform(-self.d, self.d),1), ypos)
                 # If ypos is beyond bounds.
                 # We redraw the ypos
                 if (ypos < self.r+cell_size) or (ypos > plot_size-cell_size-self.r):
                     if fleeing == True:
-                        xpos = round(self.x + rd.uniform(-self.d, self.d),1)
+                        xpos = round(self.x + rd.uniform(-self.d, self.d), 1)
                         ypos = self.y
-                    ypos = round(self.y + rd.uniform(-self.d, self.d),1)
+                    ypos = round(self.y + rd.uniform(-self.d, self.d), 1)
                     # OLDER RECURSIVE VERSION PART:
                     # return self.check_bounds(xpos, round(self.y + rd.uniform(-self.d, self.d),1))
         
@@ -192,7 +175,7 @@ class agent():
         collision = False
         for i in range(max_attempts):
             # To monitor possible RecursionError
-            newpos = (self.check_bounds(round(self.x + rd.uniform(-self.d, self.d),1), round(self.y + rd.uniform(-self.d, self.d),1), False))
+            newpos = (self.check_bounds(round(self.x + rd.uniform(-self.d, self.d), 1), round(self.y + rd.uniform(-self.d, self.d), 1), False))
             if newpos is None:
                 # print("PROBLEM")
                 new = False
@@ -240,24 +223,24 @@ class agent():
 
         if pos[1] > self.y and pos[0] > self.x or pos[1] < self.y and pos[0] < self.x:
             alpha = math.atan2(self.y-pos[1], self.x-pos[0])
-            self.x += -round(math.sin(alpha) * dispx,1)
-            self.y += -round(math.cos(alpha) * dispy,1)
+            self.x += -round(math.sin(alpha) * dispx, 1)
+            self.y += -round(math.cos(alpha) * dispy, 1)
 
         elif pos[1] == self.y:
             alpha = math.atan2(self.y-pos[1], self.x-pos[0])
-            self.x += -round(math.cos(alpha) * dispx,1)
+            self.x += -round(math.cos(alpha) * dispx, 1)
                         
         elif pos[0] == self.x:
             alpha = math.atan2(pos[1]-self.y, pos[0]-self.x)
-            self.y += round(math.sin(alpha) * dispy,1)
+            self.y += round(math.sin(alpha) * dispy, 1)
         else:
             alpha = math.atan2(self.y-pos[1], self.x-pos[0])
-            self.x += round(math.sin(alpha) * dispx,1)
-            self.y += round(math.cos(alpha) * dispy,1)        
+            self.x += round(math.sin(alpha) * dispx, 1)
+            self.y += round(math.cos(alpha) * dispy, 1)
         
 # -----------------------------------------------------------------                    
     def show(self):
-        print('Class:', self.__class__.__name__, 'Species:', self.species[0],self.species[1],'', 'x=', self.x,'', 'y=', self.y)#,'', 'biomass=', self.biomass)
+        print('Class:', self.__class__.__name__, 'Species:', self.species[0], self.species[1], '', 'x=', self.x, '', 'y=', self.y)  # ,'', 'biomass=', self.biomass)
                 # print('Biomass=', self.biomass)
 
                 
@@ -282,7 +265,7 @@ class herbivore(agent):
         self.v = 30.0
         # self.species = rd.randint(1,2)
         self.species = ('HERBIVORE', rd.randint(1,2))
-        self.biomass = 90.0 #rd.random()
+        self.biomass = 80.0  # rd.random()
         self.max_biomass = 200.0
         self.colour = (0, 0, 255)
         self.thickness = 3
@@ -295,12 +278,25 @@ class herbivore(agent):
         # Individual memory allocation to store
         # the targeted cell in the previous time step
         self.target = False
+        # This status specifies if the agent is alive or not
+        # To avoid removing items of the list of agents
+        # while looping over it, we commit agents to die by
+        # adding them to a list and changing their status so
+        # other agents cannot interact with them
+        self.status = True
         # self.biomass = np.random.rand(1,100)
         # self.k = 100.0
-        agents.append(self)
-        herbivores.append(self)        
+        try:
+            agents.append(self)
+            herbivores.append(self)
+        except:
+            print('agent missing = ', self)
+            self.show()
+            print('agent status : ', self.status)
+        
 
-# -----------------------------------------------------------------                                
+# -----------------------------------------------------------------
+
     def consume(self, cell):
 
         # if self.distance_pos((cell.x, cell.y) < self.r + cell.size():
@@ -381,11 +377,12 @@ class herbivore(agent):
 # -----------------------------------------------------------------
 
     def fleeing(self):
-        # global predators
+
         for i in range(len(predators)):
             # If there is predator(s) in visible surroundings
             # Then flee in opposite direction
-            if self.distance_pos(predators[i].pos()) <= self.v:
+            if self.distance_pos(predators[i].pos()) <= self.v\
+               and predators[i].status == True:
                 # MOVE AWAY FROM THE FIRST THREAT
 
                 xpos = predators[i].pos()[0]
@@ -432,49 +429,54 @@ class herbivore(agent):
     def reproduce(self):
         # IF THE ANIMAL HAS ENOUGH BIOMASS
         # IT CAN REPRODUCE ASEXUALLY
-        if self.biomass >= 150.0:
-            if rd.randint(0, 1)==1:
+        if self.biomass >= 160.0:
+            if rd.randint(0, 1) == 1:
                 xpos = self.x + 10.0
             else:
                 xpos = self.x - 10.0
-            if rd.randint(0, 1)==1:
+            if rd.randint(0, 1) == 1:
                 ypos = self.y + 10.0
             else:
                 ypos = self.y - 10.0
+            self.biomass = self.biomass - 80.0
             herbivore(xpos, ypos)
             
 # -----------------------------------------------------------------
 
     def update(self, grid):
 
-        # Calling the search() function multiple times can cause to obtain different
-        # value returned (in the case of predators), calling it only once and
-        # storing the returned value avoid this type of error.
-        search_result = self.search(grid)
-
         self.metabolic_cost()
         self.death(False)
-        # If there is predator(s) in visible surroundings
-        # Then flee in opposite direction
-        if self.fleeing() == True:
-            return 0
-        elif self.biomass >= 150.0:
-            self.reproduce()
-            return 0
-        # Then look for resource to consume nearby
-        # (within their vision radius)
-        elif search_result == 0:
-        # elif self.search(grid) == 0:
-            # If there is no resource move at random
-            # to a new position
-            self.random_movement()
-            return 0
-        elif search_result != 1 and search_result != 0 :
-        # elif self.search(grid) != 1 and self.search(grid) != 0 :
-            # If there is available resources nearby
-            # move towards the resource
-            self.move_to(search_result)
-            # self.move_to(self.search(grid))
+        # If the agent died not of the following takes place
+        if self.status:
+            # if self.status  == True: is equivalent to ifsefl.status:
+            # Calling the search() function multiple times can cause to obtain different
+            # value returned (in the case of predators), calling it only once and
+            # storing the returned value avoid this type of error.
+            search_result = self.search(grid)
+            # If there is predator(s) in visible surroundings
+            # Then flee in opposite direction
+            if self.fleeing():
+                return 0
+            elif self.biomass >= 150.0:
+                self.reproduce()
+                return 0
+            # Then look for resource to consume nearby
+            # (within their vision radius)
+            elif search_result == 0:
+            # elif self.search(grid) == 0:
+                # If there is no resource move at random
+                # to a new position
+                self.random_movement()
+                return 0
+            elif search_result != 1 and search_result != 0:
+            # elif self.search(grid) != 1 and self.search(grid) != 0 :
+                # If there is available resources nearby
+                # move towards the resource
+                self.move_to(search_result)
+                # self.move_to(self.search(grid))
+                return 0
+        else:
             return 0
 
 
@@ -501,17 +503,30 @@ class predator(agent):
         self.v = 40.0
         # self.species = rd.randint(1,2)
         self.species = ('PREDATOR', 1)
-        self.biomass = 90.0 #rd.random()
+        self.biomass = 80.0  # rd.random()
         self.max_biomass = 200.0
         self.colour = (255, 0, 0)
         self.thickness = 3
         # Individual memory allocation to store
         # the targeted cell in the previous time step
         self.target = False
+        # This status specifies if the agent is alive or not
+        # To avoid removing items of the list of agents
+        # while looping over it, we commit agents to die by
+        # adding them to a list and changing their status so
+        # other agents cannot interact with them
+        self.status = True
         # self.biomass = np.random.rand(1,100)
         # self.k = 100.0
-        agents.append(self)
-        predators.append(self)
+        try:
+            agents.append(self)
+            predators.append(self)
+        except:
+            print('agent missing = ', self)
+            self.show()
+            print('agent status : ', self.status)
+        
+            
 
 # -----------------------------------------------------------------
 
@@ -550,7 +565,8 @@ class predator(agent):
         # - the herbivore is part of the consumer diet
         for i in range(len(herbivores)):
             if self.distance_pos(herbivores[i].pos())\
-                   -(self.r+herbivores[i].r) <= self.v:
+                   -(self.r+herbivores[i].r) <= self.v\
+                   and herbivores[i].status == True:
                 consumables.append( (herbivores[i], max(self.distance_pos(herbivores[i].pos())-(self.r+herbivores[i].r), 0.0)) )
         if not consumables:
             return 0
@@ -582,7 +598,7 @@ class predator(agent):
         # global herbivores
         # IF THE ANIMAL HAS ENOUGH BIOMASS
         # IT CAN REPRODUCE ASEXUALLY
-        if self.biomass >= 150.0:
+        if self.biomass >= 160.0:
             if rd.randint(0, 1)==1:
                 xpos = self.x + 10.0
             else:
@@ -591,6 +607,7 @@ class predator(agent):
                 ypos = self.y + 10.0
             else:
                 ypos = self.y - 10.0
+            self.biomass = self.biomass - 80.0
             predator(xpos, ypos)
             
 # -----------------------------------------------------------------            
@@ -599,70 +616,103 @@ class predator(agent):
 
         self.metabolic_cost()
         self.death(False)
+        
+        # If the agent died none of the following takes place
+        if self.status == True:
+            # Calling the search() function multiple times can cause to obtain different
+            # value returned (in the case of predators), calling it only once and
+            # storing the returned value avoid this type of error.
+            search_result = self.search(grid)
 
-        # Calling the search() function multiple times can cause to obtain different
-        # value returned (in the case of predators), calling it only once and
-        # storing the returned value avoid this type of error.
-        search_result = self.search(grid)
+            if self.biomass >= 150.0:
+                self.reproduce()
+                return 0
 
-        if self.biomass >= 150.0:
-            self.reproduce()
-            return 0
-
-        # Look for resource to consume nearby
-        # (within their vision radius)
-        elif search_result == 0:
-            # If there is no resource move at random
-            # to a new position
-            self.random_movement()
-            return 0
-        elif search_result == 1:
-            return 0
-        elif search_result != 1 and search_result != 0 :
-            # If there is available resources nearby
-            # move towards the resource
-            # self.move_to(self.search(grid))
-            self.move_to(search_result)
+            # Look for resource to consume nearby
+            # (within their vision radius)
+            elif search_result == 0:
+                # If there is no resource move at random
+                # to a new position
+                self.random_movement()
+                return 0
+            elif search_result == 1:
+                return 0
+            elif search_result != 1 and search_result != 0 :
+                # If there is available resources nearby
+                # move towards the resource
+                # self.move_to(self.search(grid))
+                self.move_to(search_result)
+                return 0
+        else:
             return 0
 
 # -----------------------------------------------------------------            
 
 def update_all_agents(graphic, screen, grid):
-    global agents
+    # global agents
     total_herbivores = 0
     total_herbivores1 = 0
     total_herbivores2 = 0
     total_predators = 0
-    for ag in agents:
-        if graphic ==True:
-                ag.display(screen)
-        if ag.species[0] == 'HERBIVORE':
-            ag.update(grid)
-            if ag.species[1] == 1:
-                total_herbivores1 += 1
-            else:
-                total_herbivores2 += 1            
-            total_herbivores += 1
-        if ag.species[0] == 'PREDATOR':
-            ag.update(grid)           
-            total_predators += 1
 
+    # print(f" len avant: {len(agents)}")
+    for ag in agents:
+        if graphic == True:
+                ag.display(screen)
+        if ag.status == True:
+            if ag.species[0] == 'HERBIVORE':
+                ag.update(grid)
+                if ag.species[1] == 1:
+                    total_herbivores1 += 1
+                else:
+                    total_herbivores2 += 1            
+                total_herbivores += 1
+            if ag.species[0] == 'PREDATOR':
+                ag.update(grid)  
+                total_predators += 1
+
+    # print(f"len apres {len(agents)}")
+    remove_dead_agents()
     count = [ total_herbivores, total_herbivores1, total_herbivores2, total_predators ]
     return count
 
 # -----------------------------------------------------------------
 
+def remove_dead_agents():
+    # global agents
+    # global herbivores
+    # global predators
+    # global dead_agents
+    for d in dead_agents:
+        try:
+            agents.remove(d)
+        except Exception as e :
+            print(f" error - {e}")
+            print('agent missing = ', d)
+            d.show()
+            print('agent status : ', d.status)
+            print('agent list : ')
+            print(agents)
+        if d.__class__.__name__ == 'herbivore':
+            herbivores.remove(d)
+        elif d.__class__.__name__ == 'predator':
+            predators.remove(d)
+        del d
+    # Clearing all the items from the list
+    dead_agents.clear()
+    # print('Purging dead animals from the simulation')
+    return 0
+        
 ####################################################
 ####################################################
 ####################################################
 
 
-def stop_criteria():
+def stop_criteria(count):
     # global herbivores
     # global predators
 
-    if len(herbivores) == 0 or\
-       len(predators) == 0:
+    if count[1] == 0 or count[2] == 0 or count[3] == 0:
 
         print('ECOSYSTEM COLLAPSED!')
         # save_output()
