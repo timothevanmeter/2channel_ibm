@@ -1,31 +1,13 @@
-###############################################
-# Author of this project: Timothe van Meter
 
-# Last modification: March 29th 2021
-
-# Contact: tvanme2@uic.edu
-
-# License: GNU General Public License version 3
-# https://opensource.org/licenses/GPL-3.0
-###############################################
-# import matplotlibs
-# import random as rd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import math
-# from matplotlib.colors import BoundaryNorm
-# from matplotlib.ticker import MaxNLocator
 import pygame
-# import pandas as pd
-# import subprocess
-# import sys, os
+
 import threading, queue
 # -----------------------------
 import test_simulation_agenda as sim
 import test_yaml as yaml
 # -----------------------------
 
-
+print("starting")
 # READING THE NUMBER OF REPLICATES FROM yaml FILE
 replicates_number = yaml.read_plain('ibm_functioning', 'number_of_replicates')
 
@@ -124,7 +106,6 @@ def worker():
         # print(f'Finished {item}')
         sim_queue.task_done()
 
-
 # OBTAINING THE NUMBER OF SIMULATIONS TO RUN
 with open('number_of_simulation_to_run.txt', 'r') as f:
     sim_num = int(f.read())-1
@@ -132,6 +113,7 @@ with open('number_of_simulation_to_run.txt', 'r') as f:
 # THE SIMULATION RESULTS
 out.create_sim_dir(replicates_number)
 
+print("console")
 
 for j in range(int(sim_num+1)):
     sim_queue.put(simulation_main(j, sim_num))

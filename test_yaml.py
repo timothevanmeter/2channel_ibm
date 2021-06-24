@@ -12,9 +12,9 @@ import pandas as pd
 
 def read(category, parameter_name, sim_num):
 
-    sim = pd.read_csv("/home/timothe/virtualenvs/test-ibm/sim_summary.csv")
+    sim = pd.read_csv("sim_summary.csv")
     
-    with open('/home/timothe/virtualenvs/test-ibm/ibm_config.yml') as f:
+    with open('ibm_config.yml') as f:
         
         config = yaml.load(f, Loader=yaml.FullLoader)
         # If the parameter has variable values for the simulation
@@ -34,6 +34,6 @@ def read(category, parameter_name, sim_num):
 
 
 def read_plain(category, parameter_name):
-    with open('/home/timothe/virtualenvs/test-ibm/ibm_config.yml') as f:
+    with open('ibm_config.yml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
         return config[category][parameter_name]

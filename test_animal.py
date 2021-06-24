@@ -13,6 +13,7 @@ import random as rd
 import numpy as np
 # import matplotlib.pyplot as plt
 import math
+from numpy.lib.shape_base import expand_dims
 # from matplotlib.colors import BoundaryNorm
 # from matplotlib.ticker import MaxNLocator
 import pygame
@@ -23,6 +24,9 @@ import test_resource as res
 import test_display as disp
 import test_output as out
 # -----------------------------
+
+import uuid
+
 cell_size = 10
 # Expressed in number of cells:
 grid_size = 40
@@ -47,31 +51,13 @@ dead_agents = []
 class agent():
 
 # -----------------------------------------------------------------                        
-    def __init__(self, xpos, ypos):
+    def __init__(self):
 
-        pass
-        # global agents
-        # self.x = xpos
-        # self.y = ypos
-        # Body radius
-        # self.r = 10.0
-        # Dispersal distance
-        # self.d = 40.0
-        # self.species = rd.randint(1,2)
-        # self.species = ('AGENT', 0)
-        # self.biomass = 50.0 #rd.random()
-        # self.max_biomass = 200.0
-        # self.colour = (0, 0, 255)
-        # self.thickness = 3
-        # This status specifies if the agent is alive or not
-        # To avoid removing items of the list of agents
-        # while looping over it, we commit agents to die by
-        # adding them to a list and changing their status so
-        # other agents cannot interact with them
-        # self.status = True
-        # self.biomass = np.random.rand(1,100)
-        # self.k = 100.0
-        # agents.append(self)
+        self.id = uuid.uuid4()
+    
+    def __str__(self):
+        return str(self.id)
+
 
 # -----------------------------------------------------------------                    
     def pos(self):
@@ -110,21 +96,16 @@ class agent():
 
 # -----------------------------------------------------------------                    
     def death(self, forced):
-        # global dead_agents
         death_percentage = 5
-        if rd.randrange(0, 100, 1) >= 100 - death_percentage\
-           or forced == True:
+        if rd.randrange(0, 100, 1) >= 100 - death_percentage or forced == True:
             # THE AGENT DIES
-            dead_agents.append(self)
+            if self not in dead_agents:
+                dead_agents.append(self)
+            else:
+                print('tried to kill carniovre alrady dead')
+                print("problem in metabolic_cost > race condition")
+                print("-> killed twice, one forced one not")
             self.status = False
-            # agents.remove(self)
-            # if self.__class__.__name__ == 'herbivore':
-            #     herbivores.remove(self)
-            #     # print('DEATH HERBIVORE')
-            # elif self.__class__.__name__ == 'predator':
-            #     predators.remove(self)
-            #     # print('DEATH PREDATOR')
-            # del self
 
 # -----------------------------------------------------------------            
             
@@ -168,7 +149,6 @@ class agent():
 # -----------------------------------------------------------------                    
     def random_movement(self):
         
-        # global agents
         max_attempts = 10
         newpos = ()
         new = True
@@ -181,20 +161,7 @@ class agent():
                 new = False
                 return 0
 
-            # HERE THE COLLISION MODULE FOR AGENTS HAS BEEN COMMENTED OUT !
-            ###############################################################
-                # If there is a recursion error and no new coordinates
-                # Then no need to verify if there are collisions
-            # if new == True:
-            #     for i in range(len(agents)):
-            #         if 2.0*self.r > self.distance_pos(newpos) and agents[i] != self:
-            #             # Only one agent occupying (even partially) the destination (newx, newy)
-            #             # is sufficient to prevent movement.
-            #             # Therefore, the necessity to draw a new random position.
-            #             print('COLLISION!')
-            #             collision = True
-            #             break
-            ###############################################################     
+      
                     
         if collision == False and new == True:
             self.x = newpos[0]
@@ -253,8 +220,7 @@ class herbivore(agent):
     
     def __init__(self, xpos, ypos):
 
-        # global agents
-        # global herbivores
+        super().__init__()
         self.x = xpos
         self.y = ypos
         # Body radius
@@ -294,6 +260,7 @@ class herbivore(agent):
             self.show()
             print('agent status : ', self.status)
         
+
 
 # -----------------------------------------------------------------
 
@@ -491,7 +458,7 @@ class predator(agent):
     
     def __init__(self, xpos, ypos):
 
-        # global agents
+        super().__init__()
         # global predators
         self.x = xpos
         self.y = ypos
@@ -526,7 +493,9 @@ class predator(agent):
             self.show()
             print('agent status : ', self.status)
         
-            
+        def __str__(self):
+            return str(self.predator_id)
+
 
 # -----------------------------------------------------------------
 
@@ -679,24 +648,14 @@ def update_all_agents(graphic, screen, grid):
 # -----------------------------------------------------------------
 
 def remove_dead_agents():
-    # global agents
-    # global herbivores
-    # global predators
-    # global dead_agents
     for d in dead_agents:
-        try:
-            agents.remove(d)
-        except Exception as e :
-            print(f" error - {e}")
-            print('agent missing = ', d)
-            d.show()
-            print('agent status : ', d.status)
-            print('agent list : ')
-            print(agents)
+        agents.remove(d)
         if d.__class__.__name__ == 'herbivore':
             herbivores.remove(d)
-        elif d.__class__.__name__ == 'predator':
+        else:
             predators.remove(d)
+
+
         del d
     # Clearing all the items from the list
     dead_agents.clear()
@@ -733,73 +692,3 @@ def init_animals(number_h, number_p):
 
     for i in range(number_p):
         predator(init_pos(), init_pos()) 
-
-
-
-####################################################
-####################################################
-####################################################
-
-# running = True
-
-# print("-----------------------------")
-# day = 0
-
-# while running:
-#     day += 1
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-
-#     # Erase previous drawings
-#     screen.fill(background_colour)
-#     # Set count variables to 0
-#     total_biomass = 0
-#     total_herbivores = 0
-#     total_herbivores1 = 0
-#     total_herbivores2 = 0
-#     total_predators = 0
-#     total_predators1 = 0
-#     total_predators2 = 0
-#     # Update and display all cells 
-#     for cell in grid.cells:
-#         total_biomass += cell.biomass_value()
-#         cell.display(screen)
-#     for border in grid.borders:
-#         border.display(screen)
-#     grid.update()
-#     # for agent in agents:
-#     # print("# Active herbivores:", len(herbivores))
-#     # Update and display all predators
-#     for pred in predators:
-#         pred.update(grid)
-#         pred.display(screen)
-#         if pred.species[1] == 1:
-#             total_predators1 += 1
-#         else:
-#             total_predators2 += 1            
-#         total_predators += 1
-#     # Update and display all herbivores
-#     for herb in herbivores:
-#         herb.update(grid)
-#         herb.display(screen)
-#         if herb.species[1] == 1:
-#             total_herbivores1 += 1
-#         else:
-#             total_herbivores2 += 1            
-#         total_herbivores += 1
-#     # Save each time step to output
-#     out.save_output(day, round(total_biomass/150, 0), total_herbivores, total_herbivores1, total_herbivores2, total_predators, total_predators1, total_predators2)
-#     # Ensure that the ecosystem did not collapse
-#     # if stop_criteria() == False:
-#     #     break
-#     pygame.time.wait(10)
-#     # print("-----------------------------")
-#     pygame.display.flip()
-
-
-
-
-
-# out.write_output()
-# out.graph_output()
